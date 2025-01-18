@@ -31,7 +31,7 @@ initialCards.map((placesList) => {
 
 // Редактирование имени и информации о себе
 // открытие формы заполнены значениями, которые отображаются на странице
-function formNewCard () {
+function openEditProfileModal () {
     popupInputTypeName.value = profileTitle.textContent;
     popupInputTypeDescription.value = profileDescription.textContent;
     openModal(popupTypeEdit);
@@ -89,7 +89,7 @@ function openPopupImage (event) {
 }
 
 // добавляем обработчики
-profileEditButton.addEventListener('click', formNewCard);
+profileEditButton.addEventListener('click', openEditProfileModal);
 
 popupCloseTypeEdit.addEventListener('click', handleClosePopupByCloseButton);
 popupCloseTypeNewCard.addEventListener('click', handleClosePopupByCloseButton);
