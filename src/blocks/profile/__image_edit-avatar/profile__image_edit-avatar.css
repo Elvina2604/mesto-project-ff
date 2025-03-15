@@ -9,6 +9,8 @@
   transition: opacity 0.3s;
   z-index: 2;
   transform: translate(-50%, -50%);
+  background-size: cover;
+  background-position: center;
 }
 
 .profile__image_edit-avatar:hover {

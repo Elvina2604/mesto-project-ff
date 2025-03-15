@@ -34,8 +34,8 @@ const addNewCardApi = (name, link) => {
 		method: 'POST',
 		headers: config.headers,
 		body: JSON.stringify({
-			name,
-			link,
+			name: name,
+			link: link,
 		}),
 	}).then(handleResponse);
 }
@@ -61,7 +61,7 @@ const deleteCardOnAPI = (cardId) => {
 }
 
 // Отображение количества лайков карточки
-// Поставить лайк
+// Постанова и снятие лайк
 const likeCardOnAPI = (cardId) => {
     return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
         method: 'PUT',
@@ -69,7 +69,7 @@ const likeCardOnAPI = (cardId) => {
     }).then(handleResponse);
 }
 
-// Снять лайк
+// // Снять лайк
 const deleteLikeOnAPI = (cardId) => {
     return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
         method: 'DELETE',
@@ -83,7 +83,7 @@ const editAvatarUser = (avatar) => {
         method:'PATCH',
         headers: config.headers,
         body: JSON.stringify({
-            avatar,
+            avatar: avatar,
         })
     })
 }

@@ -11,10 +11,11 @@ const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const profileAvatar = document.querySelector('.profile__image');
 const popupTypeImage = document.querySelector('.popup_type_image');
+const popupImageCaption = popupTypeImage.querySelector('.popup__caption');
 const popupEditAvatar = document.querySelector('.popup_type_avatar');
 const popupCloseTypeImage = popupTypeImage.querySelector('.popup__close');
+const popupCloseTypeAvatar = popupEditAvatar.querySelector('.popup__close');
 const popupImage = popupTypeImage.querySelector('.popup__image');
-const popupImageCaption = popupTypeImage.querySelector('.popup__caption');
 const popupTypeEdit = document.querySelector('.popup_type_edit');
 const popupCloseTypeEdit = popupTypeEdit.querySelector('.popup__close');
 
@@ -34,20 +35,19 @@ const popupFormEdit = document.forms.editProfile;
 const popupFormNewCard = document.forms.newPlace;
 const popupFormEditAvatar = document.forms.updateAvatar;
 
-let UserId = null;
+let userId
 
 //Начальная загрузка информации о пользователе и карточек с сервера
 Promise.all([getInformationUser(), getCards()])
 .then(([user, initialCards]) => {
-    UserId = user._id;
+    userId = user._id;
     profileTitle.textContent = user.name;
     profileDescription.textContent = user.about;
     profileAvatar.style.background = `url(${user.avatar})`;
 
-    initialCards.forEach((card) => {
-        const names = card.likes.map(likes => likes.name);
-        const userLiked = names.includes(user.name);
-        cardsContainer.append(createCard(card, deleteCard, like, openPopupImage, UserId, userLiked));
+    initialCards.forEach((cardData) => {
+        const card = createCard(cardData, openPopupImage, deleteCard, userId, like);
+        cardsContainer.append(card);
     })
 })
 .catch(error => console.log(error))
@@ -60,14 +60,14 @@ function openEditAvatar () {
     openModal(popupEditAvatar);
 }
 
-//форма попапа аватара
+//Редактирование аватара
 function handleClosePopupEditAvatar (evt) {
     evt.preventDefault();
     renderLoading(true, popupFormEditAvatar);
-    editAvatarUser(popupInputTypeUrl.value)
+    editAvatarUser(evt.target.avatar.value)
     .then(data => {
         profileAvatar.style.backgroundImage = `url(${data.avatar})`;
-        popupFormEditAvatar.reset()
+        // popupFormEditAvatar.reset()
         closeModal(popupEditAvatar)
     })
     .catch(err => console.log(err))
@@ -116,14 +116,11 @@ function handleProfileEditFormSubmit(evt) {
 function handleCardAddFormSubmit(evt) {
     evt.preventDefault();
     renderLoading(true, popupFormNewCard);
-    // const newForm = {
-    //     name: popupInputTypeCardName.value,
-    //     link: popupInputTypeUrl.value
-    // };
-    addNewCardApi({name: popupInputTypeCardName.value,
-        link: popupInputTypeUrl.value})
+    const newCardName = popupInputTypeCardName.value;
+    const newCardLink = popupInputTypeUrl.value;
+    addNewCardApi(newCardName, newCardLink)
         .then(cardElement => {
-            cardsContainer.prepend(createCard(cardElement, deleteCard, UserId, openPopupImage));
+            cardsContainer.prepend(createCard(cardElement, openPopupImage, deleteCard, like, userId));
             closeModal(popupTypeNewCard);
         })
         .catch(error => console.log(error))
@@ -143,9 +140,15 @@ function handleCardAddFormSubmit(evt) {
 
 //открытие попапа с картинкой
 function openPopupImage (event) {
-    popupImage.setAttribute('src', event.target.src);
-    popupImage.setAttribute('alt', event.target.alt);
-    popupImageCaption.textContent = event.target.alt;
+    // popupImage.setAttribute('src', event.target.src);
+    // popupImage.setAttribute('alt', event.target.alt);
+    // popupImageCaption.textContent = event.target.alt;
+    const card = event.target;
+    const cardName = card.alt;
+    const cardLink = card.src
+    popupImageCaption.textContent = cardName;
+    popupImage.src = cardLink;
+    popupImage.alt = cardName;
     openModal(popupTypeImage);
 }
 
@@ -161,6 +164,7 @@ profileEditButton.addEventListener('click', openEditProfileModal);
 popupCloseTypeEdit.addEventListener('click', handleClosePopupByCloseButton);
 popupCloseTypeNewCard.addEventListener('click', handleClosePopupByCloseButton);
 popupCloseTypeImage.addEventListener('click', handleClosePopupByCloseButton);
+popupCloseTypeAvatar.addEventListener('click', handleClosePopupByCloseButton);
 
 popupFormEdit.addEventListener('submit', handleProfileEditFormSubmit);
 
