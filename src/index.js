@@ -4,7 +4,7 @@ import { openModal, closeModal} from '../src/components/modal.js';
 // import { initialCards } from '../src/components/cards.js';
 import {validationConfig} from '../src/components/validation.js';
 import {enableValidation, clearValidation} from '../src/components/validation.js';
-import {getInformationUser, getCards, addNewCardApi, likeCardOnAPI, deleteLikeOnAPI, deleteCardOnAPI, editAvatarUser, editInformationUser} from '../src/components/api.js';
+import {getInformationUser, getCards, addNewCardApi, editAvatarUser, editInformationUser} from '../src/components/api.js';
 
 // объявления и инициализация глобальных констант и переменных с DOM-элементами страницы
 const profileTitle = document.querySelector('.profile__title');
@@ -35,7 +35,7 @@ const popupFormEdit = document.forms.editProfile;
 const popupFormNewCard = document.forms.newPlace;
 const popupFormEditAvatar = document.forms.updateAvatar;
 
-let userId
+let userId;
 
 //Начальная загрузка информации о пользователе и карточек с сервера
 Promise.all([getInformationUser(), getCards()])
@@ -46,7 +46,10 @@ Promise.all([getInformationUser(), getCards()])
     profileAvatar.style.background = `url(${user.avatar})`;
 
     initialCards.forEach((cardData) => {
-        const card = createCard(cardData, openPopupImage, deleteCard, userId, like);
+        const names = cardData.likes.map(likes => likes.name);
+        const userLiked = names.includes(user.name);
+
+        const card = createCard(cardData, openPopupImage, deleteCard, userLiked, userId);
         cardsContainer.append(card);
     })
 })
@@ -67,8 +70,8 @@ function handleClosePopupEditAvatar (evt) {
     editAvatarUser(evt.target.avatar.value)
     .then(data => {
         profileAvatar.style.backgroundImage = `url(${data.avatar})`;
-        // popupFormEditAvatar.reset()
-        closeModal(popupEditAvatar)
+        closeModal(popupEditAvatar);
+        popupFormEditAvatar.reset()
     })
     .catch(err => console.log(err))
     .finally(() => {
@@ -119,10 +122,12 @@ function handleCardAddFormSubmit(evt) {
     const newCardName = popupInputTypeCardName.value;
     const newCardLink = popupInputTypeUrl.value;
     addNewCardApi(newCardName, newCardLink)
-        .then(cardElement => {
-            cardsContainer.prepend(createCard(cardElement, openPopupImage, deleteCard, like, userId));
+        .then(card => {
+            // cardsContainer.prepend(createCard(card, openPopupImage, deleteCard, like, userId));
+            const cardItem = createCard(card, openPopupImage, deleteCard, like, userId);
+            cardsContainer.prepend(cardItem);
             closeModal(popupTypeNewCard);
-        })
+                })
         .catch(error => console.log(error))
         .finally(() => {
             renderLoading(false, popupFormNewCard);
@@ -157,6 +162,7 @@ enableValidation(validationConfig);
 
 // добавляем обработчики
 profileAvatar.addEventListener('click', openEditAvatar);
+
 popupFormEditAvatar.addEventListener('submit', handleClosePopupEditAvatar);
 
 profileEditButton.addEventListener('click', openEditProfileModal);
@@ -164,7 +170,10 @@ profileEditButton.addEventListener('click', openEditProfileModal);
 popupCloseTypeEdit.addEventListener('click', handleClosePopupByCloseButton);
 popupCloseTypeNewCard.addEventListener('click', handleClosePopupByCloseButton);
 popupCloseTypeImage.addEventListener('click', handleClosePopupByCloseButton);
-popupCloseTypeAvatar.addEventListener('click', handleClosePopupByCloseButton);
+// popupCloseTypeAvatar.addEventListener('click',  function () {
+//     closeModal(popupEditAvatar);
+//     clearValidation(popupFormEditAvatar, validationConfig);
+//   });
 
 popupFormEdit.addEventListener('submit', handleProfileEditFormSubmit);
 

@@ -62,20 +62,22 @@ const deleteCardOnAPI = (cardId) => {
 
 // Отображение количества лайков карточки
 // Постанова и снятие лайк
-const likeCardOnAPI = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-        method: 'PUT',
-        headers: config.headers,
+const likeCardOnAPI = (cardId, isLiked) => {
+    const method = isLiked ? 'DELETE' : 'PUT'
+
+	return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+		method,
+		headers: config.headers,
     }).then(handleResponse);
 }
 
-// // Снять лайк
-const deleteLikeOnAPI = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-        method: 'DELETE',
-        headers: config.headers,
-    }).then(handleResponse);
-}
+// // // Снять лайк
+// const deleteLikeOnAPI = (cardId) => {
+//     return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+//         method: 'DELETE',
+//         headers: config.headers,
+//     }).then(handleResponse);
+// }
 
 // Обновление аватара пользователя
 const editAvatarUser = (avatar) => {
@@ -88,4 +90,4 @@ const editAvatarUser = (avatar) => {
     })
 }
 
-export {getInformationUser, getCards, addNewCardApi, likeCardOnAPI, deleteLikeOnAPI, deleteCardOnAPI, editAvatarUser, editInformationUser};
+export {getInformationUser, getCards, addNewCardApi, likeCardOnAPI, deleteCardOnAPI, editAvatarUser, editInformationUser};
