@@ -87,7 +87,7 @@ const editAvatarUser = (avatar) => {
         body: JSON.stringify({
             avatar: avatar,
         })
-    })
+    }).then(handleResponse);
 }
 
 export {getInformationUser, getCards, addNewCardApi, likeCardOnAPI, deleteCardOnAPI, editAvatarUser, editInformationUser};
